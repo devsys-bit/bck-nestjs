@@ -8,9 +8,9 @@ async function bootstrap() {
 
   app.enableCors({
     origin: true,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
-  })
+  });
 
   // Validación global de DTOs
   app.useGlobalPipes(
@@ -25,9 +25,24 @@ async function bootstrap() {
     .setTitle('Task API')
     .setDescription('API para gestión de tareas con filtros y paginación')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'APIKey',
+        name: 'APIKey',
+        description: 'Enter API Key',
+        in: 'header',
+      },
+      'APIKey-auth',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
+  
+  app.useGlobalPipes(new ValidationPipe());
+  
   SwaggerModule.setup('api', app, document);
+
 
   await app.listen(process.env.PORT ?? 3000);
 }
